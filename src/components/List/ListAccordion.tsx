@@ -29,6 +29,10 @@ type Props = {
    */
   left?: (props: { color: string }) => React.ReactNode;
   /**
+   * Callback which returns a React element to display on the right side.
+   */
+  right?: (props: { color: string, isExpanded: boolean }) => React.ReactNode;
+  /**
    * Whether the accordion is expanded
    * If this prop is provided, the accordion will behave as a "controlled component".
    * You'll need to update this prop when you want to toggle the component or on `onPress`.
@@ -38,10 +42,6 @@ type Props = {
    * Function to execute on press.
    */
   onPress?: () => void;
-  /**
-   * Function to execute on long press.
-   */
-  onLongPress?: () => void;
   /**
    * Content of the section.
    */
@@ -127,6 +127,7 @@ type Props = {
  */
 const ListAccordion = ({
   left,
+  right,
   title,
   description,
   children,
@@ -139,7 +140,6 @@ const ListAccordion = ({
   id,
   testID,
   onPress,
-  onLongPress,
   expanded: expandedProp,
 }: Props) => {
   const [expanded, setExpanded] = React.useState<boolean>(
@@ -179,7 +179,6 @@ const ListAccordion = ({
       <TouchableRipple
         style={[styles.container, style]}
         onPress={handlePress}
-        onLongPress={onLongPress}
         accessibilityTraits="button"
         accessibilityComponentType="button"
         accessibilityRole="button"
@@ -193,7 +192,6 @@ const ListAccordion = ({
             : null}
           <View style={[styles.item, styles.content]}>
             <Text
-              selectable={false}
               numberOfLines={titleNumberOfLines}
               style={[
                 styles.title,
@@ -207,7 +205,6 @@ const ListAccordion = ({
             </Text>
             {description && (
               <Text
-                selectable={false}
                 numberOfLines={descriptionNumberOfLines}
                 style={[
                   styles.description,
@@ -224,12 +221,18 @@ const ListAccordion = ({
           <View
             style={[styles.item, description ? styles.multiline : undefined]}
           >
+            {right
+            ? right({
+              color: isExpanded ? theme.colors.primary : descriptionColor,
+              isExpanded: isExpanded,
+              })
+            : 
             <MaterialCommunityIcon
               name={isExpanded ? 'chevron-up' : 'chevron-down'}
               color={titleColor}
               size={24}
               direction={I18nManager.isRTL ? 'rtl' : 'ltr'}
-            />
+            />}
           </View>
         </View>
       </TouchableRipple>
